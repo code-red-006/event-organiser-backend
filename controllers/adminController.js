@@ -27,14 +27,15 @@ module.exports = {
                 var isPasswordMatch = await bcrypt.compare(req.body.password, admin.password);
                 if(!isPasswordMatch){
                     console.log('not');
-                    res.status(401).json({msg:"invalid password"});
+                    res.status(401).json({error:{msg:"invalid password"}});
                 }
                 var payload = {
                     id: admin._id,
                     username : req.body.username,
                 }
                 jwt.sign(payload, process.env.SECRET,{ expiresIn: '1d'}, (err, token)=>{
-                    res.json({token});
+                    res.status(200).json({token});
+                    console.log(req.body.username);
 
                 });
             } catch (error) {

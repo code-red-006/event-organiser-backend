@@ -9,8 +9,11 @@ router.get('/', async function(req, res, next) {
   res.send("admin")
 });
 
+// login route
 router.post('/login', adminController.admin_login_post);
 
-router.get('/posts', verifyToken, adminController.admin_posts)
+router.get('/verify', verifyToken, (req, res)=>{
+  res.status(200).json(req.username)
+})
 
 module.exports = router;
