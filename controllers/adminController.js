@@ -1,4 +1,5 @@
 const Admin = require('../models/admin');
+const Event = require('../models/events')
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
@@ -63,6 +64,36 @@ module.exports = {
                 await Admin.updateOne({_id: req.userId }, { password: hash })
                 res.json({ok: "success"})
             } catch (error) {
+                res.status(500).json({error})
+            }
+        }
+    ],
+
+    admin_fetch_events_get: async (req, res) => {
+        try {
+            const events = await Event.find();
+            res.status(200).json({events})
+        } catch (error) {
+            res.status(500).json({error})
+        }
+    },
+
+    admin_add_event_post:[
+        body("event_name")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("event name must be specified")
+            .isAlpha('en-US', { ignore: ' '}).withMessage("event name must be in alphabetics"),
+        
+        async (req, res) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+
+            try {
+                await Event.create({ event_name: req.body.event_name });
+                res.status(200).json({ok: "ok"})
+            } catch (error) {
+                console.log(error);
                 res.status(500).json({error})
             }
         }
