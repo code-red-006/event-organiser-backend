@@ -78,10 +78,10 @@ module.exports = {
             try {
 
                 const user = await User.findOne({adm_no: req.body.adm_no});
-                if(!user) return res.status(401).json({error:[{msg: "invalid Admission number"}]});
+                if(!user) return res.status(401).json({error:[{msg: "Admission number not found! try register"}]});
 
                 const isPasswordMatch = await bcrypt.compare(req.body.password, user.password);
-                if(!isPasswordMatch) return res.status(401).json({error:[{msg: "invalid password"}]});
+                if(!isPasswordMatch) return res.status(401).json({error:[{msg: "incorrect password"}]});
 
                 const payload = {
                     id: user._id,
