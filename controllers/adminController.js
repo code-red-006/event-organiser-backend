@@ -45,8 +45,27 @@ module.exports = {
         
     ],
 
-    admin_posts:(req, res)=>{
-        res.json({name: req.username})
-    }
+    admin_reset_password_post:[
+        body("new_password")
+            .isLength({min: 7}).withMessage("new password must contain 7 characters"),
+        body("confirm_password")
+            .isLength({min: 7}).withMessage("confirm password must contain 7 characters"),
+        
+        async (req, res) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+
+            const { new_password, confirm_password } = req.body;
+            if(new_password != confirm_password) return res.status(401).json({error:[{msg:"new password didn't mathch confirm password"}]});
+
+            try {
+                const hash = await bcrypt.hash(new_password, 10);
+                await Admin.updateOne({_id: req.userId }, { password: hash })
+                res.json({ok: "success"})
+            } catch (error) {
+                res.status(500).json({error})
+            }
+        }
+    ]
 
 }

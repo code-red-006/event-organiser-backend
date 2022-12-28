@@ -32,7 +32,6 @@ module.exports = {
             .escape().withMessage("Department must be specified.")
             .isAlpha('en-US',{ignore: ' '}).withMessage("department must be in alphabetics"),
         body("password")
-            .trim()
             .isLength({ min: 8 })
             .escape().withMessage("password require minimum of 8 characters"),
 

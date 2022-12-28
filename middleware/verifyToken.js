@@ -13,6 +13,7 @@ module.exports = (req, res, next)=>{
           res.status(403).json({msg: err.message})
         }else{
             req.username = authData.username;
+            req.userId = authData.id;
             next()
         }
       })

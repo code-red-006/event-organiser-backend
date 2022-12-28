@@ -16,4 +16,7 @@ router.get('/verify', verifyToken, (req, res)=>{
   res.status(200).json(req.username)
 })
 
+//reset password
+router.post('/reset', verifyToken, adminController.admin_reset_password_post)
+
 module.exports = router;
