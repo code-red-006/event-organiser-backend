@@ -1,5 +1,5 @@
 var express = require('express');
-const { user_register_post } = require('../controllers/usersContorller');
+const { user_register_post, user_login_post } = require('../controllers/usersContorller');
 var router = express.Router();
 
 /* GET users listing. */
@@ -8,6 +8,9 @@ router.get('/', function(req, res, next) {
 });
 
 //user register route
-router.post('/register', user_register_post)
+router.post('/register', user_register_post);
+
+//user login 
+router.post('/login', user_login_post);
 
 module.exports = router;
