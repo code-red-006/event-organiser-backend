@@ -9,7 +9,7 @@ module.exports = {
             .trim()
             .isLength({ min: 1 })
             .escape().withMessage("username must be specified.")
-            .isAlphanumeric().withMessage("username cannot contain alpha-numeric charecters"),
+            .isAlpha('en-US',{ignore: ' '}).withMessage("username must be in alphabetics"),
         body("password")
             .isLength({min: 7}).withMessage("password must contain 7 charecters"),
 
@@ -27,7 +27,7 @@ module.exports = {
                 var isPasswordMatch = await bcrypt.compare(req.body.password, admin.password);
                 if(!isPasswordMatch){
                     console.log('not');
-                    res.status(401).json({error:{msg:"invalid password"}});
+                    return res.status(401).json({error:{msg:"invalid password"}});
                 }
                 var payload = {
                     id: admin._id,
