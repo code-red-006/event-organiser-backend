@@ -43,9 +43,9 @@ module.exports = {
             const { name, adm_no, mobile, year, department, password } = req.body;
             
             const isAdmNo = await User.findOne({adm_no: adm_no});
-            if(isAdmNo) return res.status(400).json({error:[{msg: "Admission number already taken"}]})
+            if(isAdmNo) return res.status(401).json({error:[{msg: "Admission number already taken"}]})
             const isMobile = await User.findOne({mobile: mobile});
-            if(isMobile) return res.status(400).json({error:[{msg: "mobile number already taken"}]});
+            if(isMobile) return res.status(401).json({error:[{msg: "mobile number already taken"}]});
 
             try {
 
