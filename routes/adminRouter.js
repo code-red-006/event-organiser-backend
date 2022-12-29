@@ -13,7 +13,7 @@ router.get('/', async function(req, res, next) {
 router.post('/login', adminController.admin_login_post);
 
 router.get('/verify', verifyAdminToken, (req, res)=>{
-  res.status(200).json(req.username)
+  res.status(200).json({username: req.username, id: req.useId})
 })
 
 //reset password
