@@ -13,7 +13,7 @@ module.exports =  (req, res, next)=>{
         if(err) return res.status(403).json({msg: err.message})
         try {
           const isAdmin = await Admin.findById(authData.id);
-          if(!isAdmin.username) return res.status(403).json({msg: "you are not admin! LOL"});
+          if(!isAdmin) return res.status(403).json({msg: "you are not admin! LOL"});
 
           req.username = authData.username;
           req.userId = authData.id;
