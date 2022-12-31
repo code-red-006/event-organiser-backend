@@ -24,6 +24,9 @@ router.post('/reset', verifyAdminToken, adminController.admin_reset_password_pos
 //remove events
 router.get('/events/delete/:id', verifyAdminToken, adminController.admin_remove_event_get);
 
+//edit event
+router.post('/events/edit/:id', verifyAdminToken, adminController.admin_edit_event_post);
+
 //fetch events
 router.get('/events', verifyAdminToken, adminController.admin_fetch_events_get);
 
