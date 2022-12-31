@@ -86,6 +86,7 @@ module.exports = {
             .isAlpha('en-US', { ignore: ' '}).withMessage("event name must be in alphabetics"),
         
         async (req, res) => {
+            console.log('yes');
             const errors = validationResult(req);
             if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
 
@@ -97,6 +98,16 @@ module.exports = {
                 res.status(500).json({error})
             }
         }
-    ]
+    ],
+
+    admin_remove_event_get: async(req, res) => {
+        try {
+            console.log('yes');
+            await Event.findByIdAndDelete(req.params.id);
+            res.status(200).json({ok: 'ok'})
+        } catch (error) {
+            res.status(500).json({error})
+        }
+    }
 
 }
