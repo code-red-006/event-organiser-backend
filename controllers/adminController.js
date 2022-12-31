@@ -97,6 +97,36 @@ module.exports = {
                 res.status(500).json({error})
             }
         }
+    ],
+
+    admin_remove_event_get: async(req, res) => {
+        try {
+            await Event.findByIdAndDelete(req.params.id);
+            res.status(200).json({ok: 'ok'})
+        } catch (error) {
+            res.status(500).json({error})
+        }
+    },
+
+    admin_edit_event_post:[
+        body("event_name")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("event name must be specified")
+            .isAlpha('en-US', { ignore: ' '}).withMessage("event name must be in alphabetics"),
+        
+        async (req, res) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+            const id = req.params.id
+            try {
+                await Event.findByIdAndUpdate(id, { event_name: req.body.event_name });
+                res.status(200).json({ok: "ok"})
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({error})
+            }
+        }
     ]
 
 }
