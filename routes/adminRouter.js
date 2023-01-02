@@ -21,6 +21,9 @@ router.post('/reset', verifyAdminToken, adminController.admin_reset_password_pos
 
 // EVENTS ROUTES //
 
+// fetch programs for specific events
+router.get('/events/:eventId/programs', verifyAdminToken, adminController.admin_fetch_programs_get)
+
 //remove events
 router.get('/events/delete/:id', verifyAdminToken, adminController.admin_remove_event_get);
 

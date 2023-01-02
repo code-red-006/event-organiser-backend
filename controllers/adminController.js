@@ -1,5 +1,8 @@
 const Admin = require('../models/admin');
-const Event = require('../models/events')
+const Event = require('../models/events');
+const SingleProgram = require('../models/singleProgram');
+const GroupeProgram = require('../models/groupeProgram');
+const async = require("async");
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
@@ -127,6 +130,28 @@ module.exports = {
                 res.status(500).json({error})
             }
         }
-    ]
+    ],
+
+    admin_fetch_programs_get: (req, res) => {
+        const eventId = req.params.eventId;
+        async.parallel(
+            {
+                singlePrograms(callback){
+                    SingleProgram.find({event_id: eventId}, "program_name").exec(callback)
+                },
+                groupePrograms(callback){
+                    GroupeProgram.find({event_id: eventId}, "program_name").exec(callback)
+                }
+            },
+            (error, result) => {
+                if(error) return res.status(500).json({error});
+
+                res.status(200).json({
+                    single: result.singlePrograms,
+                    groupe: result.groupePrograms
+                });
+            }
+        )
+    }
 
 }
