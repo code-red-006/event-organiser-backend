@@ -21,9 +21,6 @@ router.post('/reset', verifyAdminToken, adminController.admin_reset_password_pos
 
 // EVENTS ROUTES //
 
-// fetch programs for specific events
-router.get('/events/:eventId/programs', verifyAdminToken, adminController.admin_fetch_programs_get)
-
 //remove events
 router.get('/events/delete/:id', verifyAdminToken, adminController.admin_remove_event_get);
 
@@ -36,6 +33,14 @@ router.get('/events', verifyAdminToken, adminController.admin_fetch_events_get);
 // Add events
 router.post('/events', verifyAdminToken, adminController.admin_add_event_post);
 
+
+// PROGRAMS ROUTES //
+
+// fetch programs for specific events
+router.get('/events/programs/:eventId', verifyAdminToken, adminController.admin_fetch_programs_get)
+
+// add programs for specific events
+router.post('/events/programs', verifyAdminToken, adminController.admin_add_programs_post)
 
 
 module.exports = router;

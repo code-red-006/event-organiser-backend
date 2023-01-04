@@ -141,17 +141,36 @@ module.exports = {
                 },
                 groupePrograms(callback){
                     GroupeProgram.find({event_id: eventId}, "program_name").exec(callback)
-                }
+                },
             },
             (error, result) => {
                 if(error) return res.status(500).json({error});
 
                 res.status(200).json({
                     single: result.singlePrograms,
-                    groupe: result.groupePrograms
+                    groupe: result.groupePrograms,
                 });
             }
         )
-    }
+    },
+
+    admin_add_programs_post:[
+        body("program_name")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("event name must be specified"),
+
+        async(req, res) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+            try {
+                await SingleProgram.create({event_id: req.body.eventId, program_name: req.body.program_name})
+                res.status(200).json({ok: "ok"})
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({error})
+            }
+        }
+    ]
 
 }
