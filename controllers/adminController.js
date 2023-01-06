@@ -105,6 +105,8 @@ module.exports = {
     admin_remove_event_get: async(req, res) => {
         try {
             await Event.findByIdAndDelete(req.params.id);
+            await SingleProgram.deleteMany({event_id: req.params.id});
+            await GroupeProgram.deleteMany({event_id: req.params.id});
             res.status(200).json({ok: 'ok'})
         } catch (error) {
             res.status(500).json({error})
@@ -142,6 +144,9 @@ module.exports = {
                 groupePrograms(callback){
                     GroupeProgram.find({event_id: eventId}, "program_name").exec(callback)
                 },
+                event(callback){
+                    Event.findById(eventId).exec(callback)
+                }
             },
             (error, result) => {
                 if(error) return res.status(500).json({error});
@@ -149,6 +154,7 @@ module.exports = {
                 res.status(200).json({
                     single: result.singlePrograms,
                     groupe: result.groupePrograms,
+                    event: result.event
                 });
             }
         )
@@ -171,6 +177,16 @@ module.exports = {
                 res.status(500).json({error})
             }
         }
-    ]
+    ],
+
+    admin_remove_single_get: async(req, res) => {
+        const {eventId, id} = req.params;
+        try {
+            await SingleProgram.deleteOne({event_id: eventId, _id: id})
+            res.status(200).json({ok:"ok"})
+        } catch (error) {
+            res.status(500).json({error});
+        }
+    }
 
 }
