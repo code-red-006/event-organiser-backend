@@ -39,14 +39,17 @@ router.post('/events', verifyAdminToken, adminController.admin_add_event_post);
 // fetch programs for specific events
 router.get('/events/programs/:eventId', verifyAdminToken, adminController.admin_fetch_programs_get)
 
-//fetch single program deatils
-router.get('/events/programs')
-
 //remove single program
 router.get('/events/remove/single/:id', verifyAdminToken, adminController.admin_remove_single_get);
 
-// add programs for specific events
-router.post('/events/programs', verifyAdminToken, adminController.admin_add_programs_post)
+//remove groupe program
+router.get('/events/remove/groupe/:id', verifyAdminToken, adminController.admin_remove_groupe_get);
+
+// add single programs
+router.post('/events/programs/single', verifyAdminToken, adminController.admin_add_single_program_post);
+
+//add groupe program
+router.post('/events/programs/groupe' ,verifyAdminToken, adminController.admin_add_groupe_program_post);
 
 
 module.exports = router;
