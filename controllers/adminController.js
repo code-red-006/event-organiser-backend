@@ -1,5 +1,8 @@
 const Admin = require('../models/admin');
-const Event = require('../models/events')
+const Event = require('../models/events');
+const SingleProgram = require('../models/singleProgram');
+const GroupeProgram = require('../models/groupeProgram');
+const async = require("async");
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
@@ -102,6 +105,8 @@ module.exports = {
     admin_remove_event_get: async(req, res) => {
         try {
             await Event.findByIdAndDelete(req.params.id);
+            await SingleProgram.deleteMany({event_id: req.params.id});
+            await GroupeProgram.deleteMany({event_id: req.params.id});
             res.status(200).json({ok: 'ok'})
         } catch (error) {
             res.status(500).json({error})
@@ -127,6 +132,74 @@ module.exports = {
                 res.status(500).json({error})
             }
         }
-    ]
+    ],
+
+    admin_fetch_programs_get: (req, res) => {
+        const eventId = req.params.eventId;
+        async.parallel(
+            {
+                singlePrograms(callback){
+                    SingleProgram.find({event_id: eventId}).exec(callback)
+                },
+                groupePrograms(callback){
+                    GroupeProgram.find({event_id: eventId}, "program_name").exec(callback)
+                },
+                event(callback){
+                    Event.findById(eventId).exec(callback)
+                }
+            },
+            (error, result) => {
+                if(error) return res.status(500).json({error});
+
+                res.status(200).json({
+                    single: result.singlePrograms,
+                    groupe: result.groupePrograms,
+                    event: result.event
+                });
+            }
+        )
+    },
+
+    admin_add_programs_post:[
+        body("program_name")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("program name must be specified"),
+        body("description")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("description must be specified"),    
+        async(req, res) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+            let start_time = '';
+            let report_time = '';
+            if(req.body.start_time) start_time = req.body.start_time;
+            if(req.body.report_time) report_time = req.body.report_time;
+            try {
+                await SingleProgram.create({
+                    event_id: req.body.eventId,
+                    program_name: req.body.program_name,
+                    description:req.body.description,
+                    start_time,
+                    report_time,
+                })
+                res.status(200).json({ok: "ok"})
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({error})
+            }
+        }
+    ],
+
+    admin_remove_single_get: async(req, res) => {
+        const { id } = req.params;
+        try {
+            await SingleProgram.findByIdAndDelete(id);
+            res.status(200).json({ok:"ok"})
+        } catch (error) {
+            res.status(500).json({error});
+        }
+    }
 
 }
