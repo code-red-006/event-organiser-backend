@@ -39,8 +39,11 @@ router.post('/events', verifyAdminToken, adminController.admin_add_event_post);
 // fetch programs for specific events
 router.get('/events/programs/:eventId', verifyAdminToken, adminController.admin_fetch_programs_get)
 
+//fetch single program deatils
+router.get('/events/programs')
+
 //remove single program
-router.get('/events/remove/single/:eventId/:id', verifyAdminToken, adminController.admin_remove_single_get);
+router.get('/events/remove/single/:id', verifyAdminToken, adminController.admin_remove_single_get);
 
 // add programs for specific events
 router.post('/events/programs', verifyAdminToken, adminController.admin_add_programs_post)
