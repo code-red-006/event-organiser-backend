@@ -142,7 +142,7 @@ module.exports = {
                     SingleProgram.find({event_id: eventId}).exec(callback)
                 },
                 groupePrograms(callback){
-                    GroupeProgram.find({event_id: eventId}, "program_name").exec(callback)
+                    GroupeProgram.find({event_id: eventId}).exec(callback)
                 },
                 event(callback){
                     Event.findById(eventId).exec(callback)
@@ -160,7 +160,7 @@ module.exports = {
         )
     },
 
-    admin_add_programs_post:[
+    admin_add_single_program_post:[
         body("program_name")
             .trim()
             .isLength({min: 1})
@@ -172,17 +172,13 @@ module.exports = {
         async(req, res) => {
             const errors = validationResult(req);
             if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
-            let start_time = '';
-            let report_time = '';
-            if(req.body.start_time) start_time = req.body.start_time;
-            if(req.body.report_time) report_time = req.body.report_time;
             try {
                 await SingleProgram.create({
                     event_id: req.body.eventId,
                     program_name: req.body.program_name,
                     description:req.body.description,
-                    start_time,
-                    report_time,
+                    start_time: req.body.start_time,
+                    report_time: req.body.report_time,
                 })
                 res.status(200).json({ok: "ok"})
             } catch (error) {
@@ -200,6 +196,43 @@ module.exports = {
         } catch (error) {
             res.status(500).json({error});
         }
-    }
+    },
 
+    admin_add_groupe_program_post:[
+        body("program_name")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("program name must be specified"),
+        body("description")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("description must be specified"),    
+        async(req, res) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+            try {
+                await GroupeProgram.create({
+                    event_id: req.body.eventId,
+                    program_name: req.body.program_name,
+                    description:req.body.description,
+                    start_time: req.body.start_time,
+                    report_time: req.body.report_time,
+                })
+                res.status(200).json({ok: "ok"})
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({error})
+            }
+        }
+    ],
+
+    admin_remove_groupe_get: async(req, res) => {
+        const { id } = req.params;
+        try {
+            await GroupeProgram.findByIdAndDelete(id);
+            res.status(200).json({ok:"ok"})
+        } catch (error) {
+            res.status(500).json({error});
+        }
+    },
 }
