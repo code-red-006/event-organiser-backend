@@ -235,4 +235,83 @@ module.exports = {
             res.status(500).json({error});
         }
     },
+
+    admin_fetch_groupe_program: async(req, res) => {
+        const {id} = req.params;
+        try{
+            const groupeProgram = await GroupeProgram.findById(id)
+            res.status(200).json({groupeProgram})
+        }catch(error){
+            res.status(500).json({error})
+        }
+    },
+
+    admin_fetch_single_program: async(req, res) => {
+        const {id} = req.params;
+        try{
+            const singleProgram = await SingleProgram.findById(id)
+            res.status(200).json({singleProgram})
+        }catch(error){
+            res.status(500).json({error})
+        }
+    },
+
+    admin_update_groupe_program:[
+        body("program_name")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("program name must be specified"),
+        body("description")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("description must be specified"),    
+        async(req, res) => {
+            const {id} = req.params;
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+            const {program_name,description,start_time,report_time} = req.body
+            try {
+                await GroupeProgram.findByIdAndUpdate(id,{
+                    program_name,
+                    description,
+                    start_time,
+                    report_time
+                })
+                res.status(200).json({ok: "ok"})
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({error})
+            }
+        }
+    ],
+
+    admin_update_single_program:[
+        body("program_name")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("program name must be specified"),
+        body("description")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("description must be specified"),    
+        async(req, res) => {
+            const {id} = req.params;
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
+            const {program_name,description,start_time,report_time} = req.body
+            console.log(program_name);
+            try {
+                await SingleProgram.findByIdAndUpdate(id,{
+                    program_name,
+                    description,
+                    start_time,
+                    report_time
+                })
+                res.status(200).json({ok: "ok"})
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({error})
+            }
+        }
+    ],
 }
