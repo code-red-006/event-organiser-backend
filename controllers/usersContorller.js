@@ -2,6 +2,9 @@ const User = require('../models/user')
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
+const singleProgram = require('../models/singleProgram');
+const groupeProgram = require('../models/groupeProgram');
+const async = require("async");
 
 
 module.exports = {
@@ -85,7 +88,7 @@ module.exports = {
 
                 const payload = {
                     id: user._id,
-                    name: user.name,
+                    username: user.name,
                 }
                 jwt.sign(payload, process.env.SECRET,{ expiresIn: '1d'}, (err, token)=>{
                     if(err) return res.status(500).json({err})
@@ -97,5 +100,66 @@ module.exports = {
                 res.status(500).json({error})
             }
         }
-    ]
+    ],
+    user_enroll_single_get: async(req, res)  => {
+        const {proId, userId} = req.params
+        try {
+            await singleProgram.updateOne({ _id: proId }, {$push: { participants: userId}})
+            res.status(200).json({ok:"ok"})
+        } catch (error) {
+            res.status(500).json({error})
+        }
+    },
+    user_fetch_single_get: async(req, res) => {
+        const {eventId, userId} = req.params;
+        try {
+            const single = await singleProgram.find({event_id: eventId, participants :{$nin: userId}})
+            res.status(200).json({single})
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({error})
+        }
+    },
+
+    user_fetch_groupe_get: async(req, res) => {
+        const {eventId, userId} = req.params;
+        try {
+            const groupe = await groupeProgram.find({event_id: eventId, "groups.head_id":{$nin : userId}})
+            res.status(200).json({groupe})
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({error})
+        }
+    },
+
+    user_fetch_enrolled_get: (req, res) => {
+        const {eventId, userId} = req.params;
+        async.parallel(
+            {
+                single(callback){
+                    singleProgram.find({event_id: eventId, participants: {$in: userId }}).exec(callback)
+                },
+                groupe(callback){
+                    groupeProgram.find({event_id: eventId, "groups.head_id": userId}).exec(callback)
+                }
+            },
+            (error, result) => {
+                if(error) return res.status(500).json({error});
+                res.status(200).json({
+                    enrolled: [result.single, result.groupe]
+                })
+            }
+        )
+    },
+
+    user_enroll_groupe_post: async(req, res)  => {
+        const {proId} = req.params;
+        const {groupe} = req.body
+        try {
+            await groupeProgram.updateOne({ _id: proId }, {$push: { groups: groupe}})
+            res.status(200).json({ok:"ok"})
+        } catch (error) {
+            res.status(500).json({error})
+        }
+    },
 }

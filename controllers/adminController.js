@@ -73,6 +73,7 @@ module.exports = {
     ],
 
     admin_fetch_events_get: async (req, res) => {
+        console.log('yes');
         try {
             const events = await Event.find();
             res.status(200).json({events})
