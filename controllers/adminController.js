@@ -88,18 +88,45 @@ module.exports = {
             .isLength({min: 1})
             .escape().withMessage("event name must be specified")
             .isAlpha('en-US', { ignore: ' '}).withMessage("event name must be in alphabetics"),
+        body("date")
+            .trim()
+            .isLength({min: 1})
+            .escape().withMessage("event date must be specified"),
+        body("type")
+            .isLength({min: 1})
+            .escape().withMessage("event type must be specified")
+            .isAlpha('en-US', { ignore: ' '}).withMessage("event type must be in alphabetics"),
+        body("days")
+            .not().isEmpty()
+            .escape().withMessage("event days must be specified")
+            .isNumeric().withMessage("event days must be in numeric"),
         
         async (req, res) => {
             const errors = validationResult(req);
             if(!errors.isEmpty()) return res.status(400).json({error:errors.errors[0]});
-
-            try {
-                await Event.create({ event_name: req.body.event_name });
-                res.status(200).json({ok: "ok"})
-            } catch (error) {
+            try{
+                if(req.body.type === 'Arts'){
+                    if(req.body.houses && req.body.houses.length > 0){
+                        const { event_name, date, type, houses } = req.body
+                        const groupe_points = [10,5,3]
+                        const single_points = [5,3,1]
+                        await Event.create({ event_name, date, type, houses, groupe_points, single_points });
+                        return res.status(200).json({ok: "ok"})
+    
+                    }else{
+                        return res.status(400).json({error:{msg: "house must be specified"}})
+                    }
+                }else{
+                    const { event_name, date, type } = req.body;
+                    await Event.create({ event_name, date, type });
+                    return res.status(200).json({ok: "ok"})
+                }
+            }catch(error){
                 console.log(error);
                 res.status(500).json({error})
             }
+
+
         }
     ],
 

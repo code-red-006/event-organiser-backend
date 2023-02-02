@@ -31,7 +31,7 @@ router.post('/events/edit/:id', verifyAdminToken, adminController.admin_edit_eve
 router.get('/events', verifyAdminToken, adminController.admin_fetch_events_get);
 
 // Add events
-router.post('/events', verifyAdminToken, adminController.admin_add_event_post);
+router.post('/events', adminController.admin_add_event_post);
 
 
 // PROGRAMS ROUTES //
