@@ -30,6 +30,9 @@ router.post('/events/edit/:id', verifyAdminToken, adminController.admin_edit_eve
 //fetch events
 router.get('/events', verifyAdminToken, adminController.admin_fetch_events_get);
 
+//fetch one event
+router.get('/events/:eventId', verifyAdminToken, adminController.admin_fetch_one_event_get)
+
 // Add events
 router.post('/events', verifyAdminToken, adminController.admin_add_event_post);
 
