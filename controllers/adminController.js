@@ -81,6 +81,16 @@ module.exports = {
         }
     },
 
+    admin_fetch_one_event_get: async (req, res) => {
+        try {
+            const id = req.params.eventId
+            const event = await Event.findById(id);
+            res.status(200).json({event})
+        } catch (error) {
+            res.status(500).json({error})
+        }
+    },
+
     admin_add_event_post:[
         body("event_name")
             .trim()
@@ -116,8 +126,8 @@ module.exports = {
                         return res.status(400).json({error:{msg: "house must be specified"}})
                     }
                 }else{
-                    const { event_name, date, type } = req.body;
-                    await Event.create({ event_name, date, type });
+                    const { event_name, days, date, type } = req.body;
+                    await Event.create({ event_name, date, type, days });
                     return res.status(200).json({ok: "ok"})
                 }
             }catch(error){
