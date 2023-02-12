@@ -7,6 +7,7 @@ const SingleProgramSchema = new Schema({
     description: { type: String, required: true },
     start_time: { type: String },
     report_time: { type: String },
+    type: { type: String },
     participants: [ {type: Schema.Types.ObjectId, ref: "Participant"}]
 })
 
