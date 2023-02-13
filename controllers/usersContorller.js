@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
+const Event = require("../models/events");
 const { body, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const singleProgram = require("../models/singleProgram");
@@ -131,10 +132,10 @@ module.exports = {
   ],
   user_enroll_single_post: async (req, res) => {
     const { proId } = req.params;
-    const { userId, type } = req.body;
+    const { userId, type, house, eventId } = req.body;
     try {
       if (type === "off-stage" || type === "on-stage") {
-        const user = await User.findById(userId, "limit");
+        const user = await User.findById(userId, "limit chestNo");
         if (type === "off-stage") {
           if (user.limit.offStage === 4)
             return res.status(400).json({
@@ -148,7 +149,6 @@ module.exports = {
             { _id: userId },
             { $set: { "limit.offStage": ++user.limit.offStage } }
           );
-          return res.status(200).json({ ok: "ok" });
         } else if (type === "on-stage") {
           if (user.limit.onStage === 4)
             return res.status(400).json({
@@ -160,10 +160,20 @@ module.exports = {
           );
           await User.updateOne(
             { _id: userId },
-            { $set: { "limit.onStage": user.limit.onStage++ } }
+            { $set: { "limit.onStage": ++user.limit.onStage } }
           );
-          return res.status(200).json({ ok: "ok" });
         }
+        if(user.chestNo == 0){
+            const event = await Event.findById(eventId);
+            let number;
+            event.houses.forEach(item=>{
+                if(item.name == house)
+                number = item.numbers[item.numbers.length-1];
+            });
+            await Event.updateOne({_id: eventId, "houses.name": house}, {$push: {"houses.$.numbers": number+1}});
+            await User.findByIdAndUpdate(userId, {chestNo: number+1});
+        } 
+        return res.status(200).json({ ok: "ok" });
       }
 
       await singleProgram.updateOne(
@@ -172,6 +182,7 @@ module.exports = {
       );
       res.status(200).json({ ok: "ok" });
     } catch (error) {
+        console.log(error);
       res.status(500).json({ error });
     }
   },

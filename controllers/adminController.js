@@ -73,11 +73,9 @@ module.exports = {
 
       const { new_password, confirm_password } = req.body;
       if (new_password != confirm_password)
-        return res
-          .status(401)
-          .json({
-            error: [{ msg: "new password didn't mathch confirm password" }],
-          });
+        return res.status(401).json({
+          error: [{ msg: "new password didn't mathch confirm password" }],
+        });
 
       try {
         const hash = await bcrypt.hash(new_password, 10);
@@ -142,6 +140,13 @@ module.exports = {
         if (req.body.type === "Arts") {
           if (req.body.houses && req.body.houses.length > 0) {
             const { event_name, date, type, days, houses } = req.body;
+            let temp = [];
+            houses.forEach((item, index) => {
+              temp.push({
+                name: item,
+                numbers: (index + 1) * 100,
+              });
+            });
             const groupe_points = [10, 5, 3];
             const single_points = [5, 3, 1];
             await Event.create({
@@ -149,7 +154,7 @@ module.exports = {
               date,
               type,
               days,
-              houses,
+              houses: temp,
               groupe_points,
               single_points,
             });
@@ -380,10 +385,11 @@ module.exports = {
   admin_fetch_single_program: async (req, res) => {
     const { id } = req.params;
     try {
-      const singleProgram = await SingleProgram.findById(id);
+      const singleProgram = await SingleProgram.findById(id).populate('participants', 'name chestNo adm_no house');
       res.status(200).json({ singleProgram });
     } catch (error) {
       res.status(500).json({ error });
+      console.log("er"+error);
     }
   },
 
