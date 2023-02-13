@@ -5,7 +5,10 @@ const EventSchema = new Schema({
   event_name: { type: String, required: true },
   date: { type: String, required: true },
   days: { type: Number, required: true },
-  houses: [{ type: String }],
+  houses: [{ 
+    name: {type: String},
+    numbers: [{type: Number, default: 0}]
+   }],
   type: { type: String, required: true },
   groupe_points: [{ type: Number }],
   single_points: [{ type: Number }]

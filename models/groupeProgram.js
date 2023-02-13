@@ -7,9 +7,16 @@ const GroupeProgramSchema = new Schema({
     description: { type: String, required: true },
     start_time: { type: String },
     report_time: { type: String },
+    type: { type: String },
+    limit: [{
+        house: {type: String},
+        items: {type: Number, default: 0},
+    }],
     groups:[{
         head_id: {type: Schema.Types.ObjectId, ref: "User"},
-        group_name: {type: String}
+        group_name: {type: String},
+        house: {type: String},
+        members: [{type: Schema.Types.ObjectId, ref: "User"}]
     }]
 })
 

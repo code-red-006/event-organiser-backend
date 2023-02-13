@@ -9,6 +9,12 @@ const UserSchema = new Schema({
     mobile: { type: Number, required: true, unique: true },
     year: { type: Number, required: true, min: 1, max: 3 },
     department: { type: String, required: true },
+    house: { type: String },
+    chestNo: { type: Number, default: 0 },
+    limit: {
+        offStage: { type: Number, default: 0 }, //individul and groupe
+        onStage: { type: Number, default: 0 } //individual only
+    },
     password: { type: String, required: true } 
 });
 
