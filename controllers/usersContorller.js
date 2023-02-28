@@ -206,7 +206,9 @@ module.exports = {
       const groupe = await groupeProgram.find({
         event_id: eventId,
         "groups.head_id": { $nin: userId },
+        groups: {$not: {$elemMatch: {members: userId}}}
       });
+
       res.status(200).json({ groupe });
     } catch (error) {
       console.log(error);
@@ -223,16 +225,21 @@ module.exports = {
             .find({ event_id: eventId, participants: { $in: userId } })
             .exec(callback);
         },
-        groupe(callback) {
+        groupe_head(callback) {
           groupeProgram
             .find({ event_id: eventId, "groups.head_id": userId })
+            .exec(callback);
+        },
+        groupe_member(callback) {
+          groupeProgram
+            .find({ event_id: eventId, groups: {$elemMatch:{members: userId}} })
             .exec(callback);
         },
       },
       (error, result) => {
         if (error) return res.status(500).json({ error });
         res.status(200).json({
-          enrolled: [result.single, result.groupe],
+          enrolled: [result.single, [...result.groupe_head, ...result.groupe_member]],
         });
       }
     );
@@ -260,7 +267,8 @@ module.exports = {
             temp = [...new Set(temp)]
             temp.forEach(async item=>{
                 await User.findByIdAndUpdate(item, { $inc: { "limit.offStage": 1 } });
-            })
+            });
+            
         } else if (type === "on-stage") {
           if (program.limit[index].items === 2)
             return res.status(400).json({

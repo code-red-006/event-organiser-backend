@@ -8,7 +8,8 @@ const SingleProgramSchema = new Schema({
     start_time: { type: String },
     report_time: { type: String },
     type: { type: String },
-    participants: [{type: Schema.Types.ObjectId, ref: "User"}]
+    participants: [{type: Schema.Types.ObjectId, ref: "User"}],
+    finished: {type: Schema.Types.Boolean}
 })
 
 SingleProgramSchema.virtual('getStartTime').get(function(){
