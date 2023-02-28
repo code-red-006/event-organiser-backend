@@ -11,6 +11,7 @@ const UserSchema = new Schema({
     department: { type: String, required: true },
     house: { type: String },
     chestNo: { type: Number, default: 0 },
+    points: { type: Number, default: 0 },
     limit: {
         offStage: { type: Number, default: 0 }, //individul and groupe
         onStage: { type: Number, default: 0 } //individual only

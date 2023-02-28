@@ -221,13 +221,11 @@ module.exports = {
       try {
         if (req.body.type === "Arts") {
           if (req.body.houses && req.body.houses.length > 0) {
-            const { event_name, date, type, days, houses } = req.body;
+            const { event_name, date, days } = req.body;
             await Event.findByIdAndUpdate(id, {
               event_name,
               date,
-              type,
               days,
-              houses,
             });
             return res.status(200).json({ ok: "ok" });
           } else {
@@ -252,10 +250,10 @@ module.exports = {
     async.parallel(
       {
         singlePrograms(callback) {
-          SingleProgram.find({ event_id: eventId }).exec(callback);
+          SingleProgram.find({ event_id: eventId }).populate('participants', 'name chestNo adm_no house').exec(callback);
         },
         groupePrograms(callback) {
-          GroupeProgram.find({ event_id: eventId }).exec(callback);
+          GroupeProgram.find({ event_id: eventId }).populate('groups.head_id', 'name adm_no house').populate('groups.members', 'name adm_no').exec(callback);
         },
         event(callback) {
           Event.findById(eventId).exec(callback);
@@ -340,7 +338,7 @@ module.exports = {
         let temp = [];
         data.houses.forEach((item) => {
           temp.push({
-            house: item,
+            house: item.name,
             items: 0,
           });
         });
