@@ -64,7 +64,12 @@ router.post('/events/update/single/:id', verifyAdminToken, adminController.admin
 router.post('/events/programs/single', verifyAdminToken, adminController.admin_add_single_program_post);
 
 //add groupe program
-router.post('/events/programs/groupe' ,verifyAdminToken, adminController.admin_add_groupe_program_post);
+router.post('/events/programs/groupe', verifyAdminToken, adminController.admin_add_groupe_program_post);
 
+//finish single program
+router.post('/programs/finish/single/:proId', verifyAdminToken, adminController.admin_finish_single_post )
+
+//finish single program
+router.post('/programs/finish/group/:proId', verifyAdminToken, adminController.admin_finish_group_post )
 
 module.exports = router;

@@ -9,7 +9,10 @@ const SingleProgramSchema = new Schema({
     report_time: { type: String },
     type: { type: String },
     participants: [{type: Schema.Types.ObjectId, ref: "User"}],
-    finished: {type: Schema.Types.Boolean}
+    finished: {type: Schema.Types.Boolean, default: false},
+    first: {type: Schema.Types.ObjectId, ref: "User"},
+    second: {type: Schema.Types.ObjectId, ref: "User"},
+    third: {type: Schema.Types.ObjectId, ref: "User"}
 })
 
 SingleProgramSchema.virtual('getStartTime').get(function(){

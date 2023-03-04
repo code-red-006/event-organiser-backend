@@ -1,4 +1,5 @@
 const Admin = require("../models/admin");
+const User = require("../models/user");
 const Event = require("../models/events");
 const SingleProgram = require("../models/singleProgram");
 const GroupeProgram = require("../models/groupeProgram");
@@ -373,9 +374,10 @@ module.exports = {
   admin_fetch_groupe_program: async (req, res) => {
     const { id } = req.params;
     try {
-      const groupeProgram = await GroupeProgram.findById(id);
+      const groupeProgram = await GroupeProgram.findById(id).populate('groups.head_id', 'name adm_no').populate('groups.members', 'name adm_no');
       res.status(200).json({ groupeProgram });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error });
     }
   },
@@ -467,4 +469,81 @@ module.exports = {
       }
     },
   ],
+
+  admin_finish_single_post: async(req, res) => {
+    const { proId } = req.params;
+    const { first, second, third, eventId } = req.body;
+
+    if(first != -1){
+      try {
+        const {single_points: points} = await Event.findById(eventId, "single_points")
+        await User.findByIdAndUpdate(first.id, {
+          $inc: { points: points[0]}
+        })
+        await Event.updateOne({_id: eventId, "houses.name": first.house}, { $inc: { "houses.$.overall": points[0] } })
+        if(second != -1){
+          await User.findByIdAndUpdate(second.id, { $inc: { points: points[1]} })
+          await Event.updateOne({_id: eventId, "houses.name": second.house}, { $inc: { "houses.$.overall": points[1] } })
+        }
+        if(third != -1){
+          await User.findByIdAndUpdate(third.id, { $inc: { points: points[2]} })
+          await Event.updateOne({_id: eventId, "houses.name": third.house}, { $inc: { "houses.$.overall": points[2] } })
+        }
+        await SingleProgram.findByIdAndUpdate(proId, {
+          $set: {
+            finished: true,
+            first: first.id,
+            second: second != -1? second.id: null,
+            third: third != -1? third.id: null
+          }
+        })
+        return res.status(200).json({ ok: "ok" });
+      } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error });
+      }
+    }
+    
+  },
+
+  admin_finish_group_post: async(req, res) => {
+    const { proId } = req.params;
+    const { first, second, third, eventId } = req.body;
+    console.log(first);
+    if(first != -1){
+      try {
+        const {groupe_points: points} = await Event.findById(eventId, "groupe_points")
+        await GroupeProgram.updateOne({_id: proId, "groups.head_id": first.head_id}, {
+          $set: {
+            "groups.$.points": points[0]
+          }
+        })
+        console.log(first.house);
+        await Event.updateOne({_id: eventId, "houses.name": first.house}, { $inc: { "houses.$.overall": points[0] } })
+        first.members.forEach(async(user)=> await User.findByIdAndUpdate(user, { $inc: { points: 3} }) )
+        if(second != -1){
+          await GroupeProgram.updateOne({_id: proId, "groups.head_id": second.head_id}, { $set: { "groups.$.points": points[1] } } )
+          await Event.updateOne({_id: eventId, "houses.name": second.house}, { $inc: { "houses.$.overall": points[1] } })
+          second.members.forEach(async(user)=> await User.findByIdAndUpdate(user, { $inc: { points: 2} }) )
+        }
+        if(third != -1){
+          await GroupeProgram.updateOne({_id: proId, "groups.head_id": third.head_id}, { $set: { "groups.$.points": points[2] } } )
+          await Event.updateOne({_id: eventId, "houses.name": third.house}, { $inc: { "houses.$.overall": points[2] } })
+          third.members.forEach(async(user)=> await User.findByIdAndUpdate(user, { $inc: { points: 1} }) )
+        }
+        await GroupeProgram.findByIdAndUpdate(proId, {
+          $set: {
+            finished: true,
+            first: first.head_id,
+            second: second != -1? second.head_id: null,
+            third: third != -1? third.head_id: null
+          }
+        })
+        return res.status(200).json({ ok: "ok" });
+      } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error });
+      }
+    }
+  }
 };
