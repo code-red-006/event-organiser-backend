@@ -250,7 +250,7 @@ module.exports = {
     const { groupe, type } = req.body;
     try {
       if (type === "off-stage" || type === "on-stage") {
-        const program = await groupeProgram.findById(proId, "limit");
+        const program = await groupeProgram.findById(proId, "limit event_id");
         let index;
         program.limit.forEach((item, i) => {
           if (item.house === groupe.house) {
@@ -284,6 +284,16 @@ module.exports = {
             $push: { groups: groupe },
           }
         );
+        const event = await Event.findById(program.event_id);
+        let number;
+        event.houses.forEach(item=>{
+            if(item.name == groupe.house)
+            number = item.numbers[item.numbers.length-1];
+        });
+        await Event.updateOne({_id: program.event_id, "houses.name": groupe.house}, {$push: {"houses.$.numbers": number+1}});
+        await groupeProgram.updateOne({_id: proId, "groups.head_id": groupe.head_id}, { $set: {
+          "groups.$.chestNo": number+1
+        }})
         return res.status(200).json({ ok: "ok" });
       }
       await groupeProgram.updateOne(

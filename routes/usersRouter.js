@@ -42,7 +42,7 @@ router.get('/programs/enrolled/:eventId/:userId', verifyUserToken, usersContorll
 router.post('/single/:proId', verifyUserToken, usersContorller.user_enroll_single_post);
 
 //enroll groupe programs
-router.post('/groupe/:proId/:userId', verifyUserToken, usersContorller.user_enroll_groupe_post)
+router.post('/groupe/:proId/:userId', verifyUserToken, usersContorller.user_enroll_groupe_post);
 
 //get user house
 router.get('/house/:userId', verifyUserToken, usersContorller.user_fetch_house_get);

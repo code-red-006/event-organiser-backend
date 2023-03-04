@@ -16,10 +16,14 @@ const GroupeProgramSchema = new Schema({
         head_id: {type: Schema.Types.ObjectId, ref: "User"},
         group_name: {type: String},
         house: {type: String},
+        chestNo: {type: String, default: ''},
         members: [{type: Schema.Types.ObjectId, ref: "User"}],
         points: { type: Number, default: 0 },
     }],
-    finished: {type: Schema.Types.Boolean}
+    first: {type: Schema.Types.ObjectId, ref: "User"},
+    second: {type: Schema.Types.ObjectId, ref: "User"},
+    third: {type: Schema.Types.ObjectId, ref: "User"},
+    finished: {type: Schema.Types.Boolean , default: false}
 })
 
 module.exports = mongoose.model('GroupeProgram', GroupeProgramSchema);
