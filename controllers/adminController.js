@@ -545,5 +545,16 @@ module.exports = {
         return res.status(500).json({ error });
       }
     }
+  },
+
+  admin_get_event_score: async(req, res) => {
+    const { eventId } = req.params;
+    try {
+      const scores = await Event.findById(eventId, "houses.name houses.overall");
+      return res.status(200).json({ scores: scores.houses });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error });
+    }
   }
 };

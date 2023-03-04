@@ -36,6 +36,9 @@ router.get('/events/:eventId', verifyAdminToken, adminController.admin_fetch_one
 // Add events
 router.post('/events', verifyAdminToken, adminController.admin_add_event_post);
 
+//get houses score
+router.get('/events/score/:eventId', verifyAdminToken, adminController.admin_get_event_score)
+
 
 // PROGRAMS ROUTES //
 
@@ -71,5 +74,6 @@ router.post('/programs/finish/single/:proId', verifyAdminToken, adminController.
 
 //finish single program
 router.post('/programs/finish/group/:proId', verifyAdminToken, adminController.admin_finish_group_post )
+
 
 module.exports = router;
