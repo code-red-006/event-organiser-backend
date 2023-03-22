@@ -56,4 +56,7 @@ router.get('/check/off-stage/:admNo', verifyUserToken, usersContorller.user_chec
 //check user limit on-stage
 router.get('/check/on-stage/:admNo', verifyUserToken, usersContorller.user_check_limit_on_stage_get);
 
+//fetch score
+router.get('/events/score/:eventId', verifyUserToken, adminController.admin_get_event_score)
+
 module.exports = router;
