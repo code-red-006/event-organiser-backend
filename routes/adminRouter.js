@@ -75,5 +75,7 @@ router.post('/programs/finish/single/:proId', verifyAdminToken, adminController.
 //finish single program
 router.post('/programs/finish/group/:proId', verifyAdminToken, adminController.admin_finish_group_post )
 
+//get individual points
+router.get('/participants/score/:eventId', verifyAdminToken, adminController.admin_get_individual_points )
 
 module.exports = router;

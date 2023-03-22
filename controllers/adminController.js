@@ -556,5 +556,17 @@ module.exports = {
       console.log(error);
       return res.status(500).json({ error });
     }
+  },
+
+  admin_get_individual_points: async(req, res) => {
+    const {eventId} = req.params;
+    try {
+      const participants = await User.find({}, "name house points").sort({points: -1})
+      return res.status(200).json({ participants });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error });
+    }
   }
+
 };
