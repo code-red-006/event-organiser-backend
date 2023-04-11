@@ -12,6 +12,7 @@ const UserSchema = new Schema({
     house: { type: String },
     chestNo: { type: Number, default: 0 },
     points: { type: Number, default: 0 },
+    events: [{points: { type: Number }, event_id:{ type: Schema.Types.ObjectId, ref: "Event"} }],
     limit: {
         offStage: { type: Number, default: 0 }, //individul and groupe
         onStage: { type: Number, default: 0 } //individual only

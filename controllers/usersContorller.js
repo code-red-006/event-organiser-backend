@@ -149,6 +149,10 @@ module.exports = {
             { _id: userId },
             { $set: { "limit.offStage": ++user.limit.offStage } }
           );
+          const isEvent = await User.findOne({_id: userId, "events.event_id": eventId})
+          if(!isEvent){
+            await User.findByIdAndUpdate(userId, {$push: {events:{points: 0, event_id: eventId}}});
+          }
         } else if (type === "on-stage") {
           if (user.limit.onStage === 4)
             return res.status(400).json({
@@ -162,6 +166,10 @@ module.exports = {
             { _id: userId },
             { $set: { "limit.onStage": ++user.limit.onStage } }
           );
+          const isEvent = await User.findOne({_id: userId, "events.event_id": eventId})
+          if(!isEvent){
+            await User.findByIdAndUpdate(userId, {$push: {events:{points: 0, event_id: eventId}}});
+          }
         }
         if(user.chestNo == 0){
             const event = await Event.findById(eventId);
@@ -248,6 +256,9 @@ module.exports = {
   user_enroll_groupe_post: async (req, res) => {
     const { proId } = req.params;
     const { groupe, type } = req.body;
+
+    let temp = groupe.members;
+    temp = [...new Set(temp)];
     try {
       if (type === "off-stage" || type === "on-stage") {
         const program = await groupeProgram.findById(proId, "limit event_id");
@@ -263,10 +274,9 @@ module.exports = {
               msg: `${groupe.house} house has already 3 teams in this program`,
             });
             await User.findByIdAndUpdate(groupe.head_id, { $inc: { "limit.offStage": 1 } });
-            let temp = groupe.members;
-            temp = [...new Set(temp)]
+
             temp.forEach(async item=>{
-                await User.findByIdAndUpdate(item, { $inc: { "limit.offStage": 1 } });
+              await User.findByIdAndUpdate(item, { $inc: { "limit.offStage": 1 } });
             });
             
         } else if (type === "on-stage") {
@@ -275,6 +285,16 @@ module.exports = {
               msg: `${groupe.house} house has already 3 teams in this program`,
             });
         }
+        const isEvent = await User.findOne({_id: groupe.head_id, "events.event_id": program.event_id})
+        if(!isEvent){
+          await User.findByIdAndUpdate(groupe.head_id, {$push: {events:{points: 0, event_id: program.event_id}}});
+        }
+        temp.forEach(async item=>{
+          const isEvent = await User.findOne({_id: item, "events.event_id": program.event_id})
+          if(!isEvent){
+            await User.findByIdAndUpdate(item, {$push: {events:{points: 0, event_id: program.event_id}}});
+          }
+        })
         await groupeProgram.updateOne(
           { _id: proId, "limit.house": groupe.house },
           {
