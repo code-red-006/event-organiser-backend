@@ -477,16 +477,14 @@ module.exports = {
     if(first != -1){
       try {
         const {single_points: points} = await Event.findById(eventId, "single_points")
-        await User.findByIdAndUpdate(first.id, {
-          $inc: { points: points[0]}
-        })
+        await User.updateOne({_id: first.id, "events.event_id": eventId}, {$inc: { "events.$.points": points[0]} })
         await Event.updateOne({_id: eventId, "houses.name": first.house}, { $inc: { "houses.$.overall": points[0] } })
         if(second != -1){
-          await User.updateOne({_id: second.id}, { $inc: { points: points[1]} })
+          await User.updateOne({_id: second.id, "events.event_id": eventId}, { $inc: { "events.$.points": points[1]} })
           await Event.updateOne({_id: eventId, "houses.name": second.house}, { $inc: { "houses.$.overall": points[1] } })
         }
         if(third != -1){
-          await User.findByIdAndUpdate(third.id, { $inc: { points: points[2]} })
+          await User.updateOne({_id: third.id, "events.event_id": eventId}, { $inc: { "events.$.points": points[2]} })
           await Event.updateOne({_id: eventId, "houses.name": third.house}, { $inc: { "houses.$.overall": points[2] } })
         }
         await SingleProgram.findByIdAndUpdate(proId, {
@@ -520,16 +518,16 @@ module.exports = {
         })
         console.log(first.house);
         await Event.updateOne({_id: eventId, "houses.name": first.house}, { $inc: { "houses.$.overall": points[0] } })
-        first.members.forEach(async(user)=> await User.findByIdAndUpdate(user, { $inc: { points: 3} }) )
+        first.members.forEach(async(user)=> await User.updateOne({_id: user, "events.event_id": eventId}, { $inc: { "events.$.points": 3} }) )
         if(second != -1){
           await GroupeProgram.updateOne({_id: proId, "groups.head_id": second.head_id}, { $set: { "groups.$.points": points[1] } } )
           await Event.updateOne({_id: eventId, "houses.name": second.house}, { $inc: { "houses.$.overall": points[1] } })
-          second.members.forEach(async(user)=> await User.findByIdAndUpdate(user, { $inc: { points: 2} }) )
+          second.members.forEach(async(user)=> await User.updateOne({_id: user, "events.event_id": eventId}, { $inc: { "events.$.points": 2} }) )
         }
         if(third != -1){
           await GroupeProgram.updateOne({_id: proId, "groups.head_id": third.head_id}, { $set: { "groups.$.points": points[2] } } )
           await Event.updateOne({_id: eventId, "houses.name": third.house}, { $inc: { "houses.$.overall": points[2] } })
-          third.members.forEach(async(user)=> await User.findByIdAndUpdate(user, { $inc: { points: 1} }) )
+          third.members.forEach(async(user)=> await User.updateOne({_id: user, "events.event_id": eventId}, { $inc: { "events.$.points": 1} }) )
         }
         await GroupeProgram.findByIdAndUpdate(proId, {
           $set: {
@@ -561,7 +559,7 @@ module.exports = {
   admin_get_individual_points: async(req, res) => {
     const {eventId} = req.params;
     try {
-      const participants = await User.find({}, "name house points").sort({points: -1})
+      const participants = await User.find({"events.event_id": eventId}, "name house events").sort({points: -1})
       return res.status(200).json({ participants });
     } catch (error) {
       console.log(error);
