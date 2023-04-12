@@ -482,7 +482,7 @@ module.exports = {
         })
         await Event.updateOne({_id: eventId, "houses.name": first.house}, { $inc: { "houses.$.overall": points[0] } })
         if(second != -1){
-          await User.findByIdAndUpdate(second.id, { $inc: { points: points[1]} })
+          await User.updateOne({_id: second.id}, { $inc: { points: points[1]} })
           await Event.updateOne({_id: eventId, "houses.name": second.house}, { $inc: { "houses.$.overall": points[1] } })
         }
         if(third != -1){
