@@ -517,14 +517,17 @@ module.exports = {
           }
         })
         console.log(first.house);
+        await User.updateOne({_id: first.head_id, "events.event_id": eventId}, { $inc: { "events.$.points": 3} }) 
         await Event.updateOne({_id: eventId, "houses.name": first.house}, { $inc: { "houses.$.overall": points[0] } })
         first.members.forEach(async(user)=> await User.updateOne({_id: user, "events.event_id": eventId}, { $inc: { "events.$.points": 3} }) )
         if(second != -1){
+          await User.updateOne({_id: second.head_id, "events.event_id": eventId}, { $inc: { "events.$.points": 2} }) 
           await GroupeProgram.updateOne({_id: proId, "groups.head_id": second.head_id}, { $set: { "groups.$.points": points[1] } } )
           await Event.updateOne({_id: eventId, "houses.name": second.house}, { $inc: { "houses.$.overall": points[1] } })
           second.members.forEach(async(user)=> await User.updateOne({_id: user, "events.event_id": eventId}, { $inc: { "events.$.points": 2} }) )
         }
         if(third != -1){
+          await User.updateOne({_id: third.head_id, "events.event_id": eventId}, { $inc: { "events.$.points": 1} }) 
           await GroupeProgram.updateOne({_id: proId, "groups.head_id": third.head_id}, { $set: { "groups.$.points": points[2] } } )
           await Event.updateOne({_id: eventId, "houses.name": third.house}, { $inc: { "houses.$.overall": points[2] } })
           third.members.forEach(async(user)=> await User.updateOne({_id: user, "events.event_id": eventId}, { $inc: { "events.$.points": 1} }) )
